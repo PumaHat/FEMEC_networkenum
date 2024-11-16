@@ -1,0 +1,41 @@
+services:
+  web-service:
+    build: web_db/
+    networks:
+        - my_network
+
+  ftp-server:
+    container_name: my-ftp-server
+    environment:
+      - FTP_PASS=123
+      - FTP_USER=user
+    image: garethflowers/ftp-server
+    volumes:
+      - '/data:/home/user'
+    networks:
+        - my_network
+
+  samba:
+    image: dperson/samba
+    environment:
+      TZ: 'EST5EDT'
+    networks:
+      - my_network
+    read_only: true
+    tmpfs:
+      - /tmp
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    volumes:
+      - /mnt:/mnt:z
+      - /mnt2:/mnt2:z
+    command: '-s "Mount;/mnt" -s "Bobs Volume;/mnt2;yes;no;no;bob" -u "bob;bobspasswd" -p'
+
+networks:
+  my_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/24
