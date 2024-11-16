@@ -1,11 +1,12 @@
 services:
   web-service:
-    build: web_db/
+    build: web/
+    container_name: femec-web
     networks:
         - my_network
 
   ftp-server:
-    container_name: my-ftp-server
+    container_name: femec-ftp
     environment:
       - FTP_PASS=123
       - FTP_USER=user
@@ -15,8 +16,18 @@ services:
     networks:
         - my_network
 
+  db:
+    image: mysql
+    container_name: femec-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASS}
+    networks:
+        - my_network
+
   samba:
     image: dperson/samba
+    container_name: femec-smbserver
     environment:
       TZ: 'EST5EDT'
     networks:
